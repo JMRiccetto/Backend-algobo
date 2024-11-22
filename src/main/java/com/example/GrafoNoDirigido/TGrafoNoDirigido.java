@@ -147,4 +147,30 @@ public class TGrafoNoDirigido extends TGrafoDirigido implements IGrafoNoDirigido
         desvisitarVertices();
         return false;
     }
+
+    public double[][] floydWarshall() {
+        int n = this.getVertices().size();
+        double[][] distancias = this.obtenerMatrizAdyacencia(); 
+        
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i != j && distancias[i][j] == 0) {
+                    distancias[i][j] = Double.POSITIVE_INFINITY;
+                }
+            }
+        }
+        
+        for (int k = 0; k < n; k++) {
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (distancias[i][k] + distancias[k][j] < distancias[i][j]) {
+                        distancias[i][j] = distancias[i][k] + distancias[k][j];
+                    }
+                }
+            }
+        }
+        
+        return distancias;
+    }
+
 }
