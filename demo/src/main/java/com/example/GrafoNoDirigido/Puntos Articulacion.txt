@@ -1,0 +1,47 @@
+TGrafoNoDirigido:
+
+    public LinkedList<TVertice> puntosArticulacion(Comparable etOrigen) {
+        if (esConexo()) {
+            desvisitarVertices();
+            int[] cont = {0};
+            LinkedList<TVertice> puntos = new LinkedList<>();
+            TVertice vert = this.buscarVertice(etOrigen);
+            if (vert != null) {
+                vert.puntosArt(puntos, cont);
+            }
+            return puntos;
+        }
+        return null;
+    }
+
+TVertice:
+
+    public void puntosDeArticulacion(LinkedList<TVertice> vertices, int[] numBpf, Comparable padre) {
+        this.visitado = true;
+        this.numBpf = numBpf[0];
+        numBpf[0]++;
+        this.numBajo = this.numBpf;
+        int cantHijosRaiz = 0;
+        for(TAdyacencia adyacente : adyacentes){
+            TVertice vertice = adyacente.getDestino();
+            if(!vertice.visitado){
+                vertice.puntosDeArticulacion(vertices, numBpf, this.etiqueta);
+                if(vertice.numBajo<this.numBajo){
+                    this.numBajo = vertice.numBajo;
+                }
+                if(!vertices.contains(this) && vertice.numBajo > this.numBpf){
+                    vertices.add(this);
+                }
+            }else{  //SI YA ESTÁ VISITADO ES UN ARCO DE RETROCESO
+                if(vertice.etiqueta != padre){    
+                    if(vertice.numBpf < this.numBajo){
+                        this.numBajo = vertice.numBpf;
+                    }
+                }
+            }
+            cantHijosRaiz++;    //LA RAIZ NO PUEDE TENER ARCOS DE RETROCESO
+        }
+        if(!vertices.contains(this) && padre==null && (cantHijosRaiz > 1)){
+            vertices.add(this);
+        }
+    }

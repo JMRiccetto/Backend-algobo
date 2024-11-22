@@ -1,0 +1,18 @@
+    public TGrafoNoDirigido Kruskal() {
+        TGrafoNoDirigido arbolCostoMinimo = new TGrafoNoDirigido(this.getVertices().values(), new TAristas());
+        TAristas aristasOrdenadas = new TAristas();
+        aristasOrdenadas.addAll(this.lasAristas);
+        aristasOrdenadas.ordenarPorCostoCreciente();
+        int aristasAgregadas = 0;
+
+        while (aristasAgregadas <= getVertices().size() - 1) {
+            TArista aristaMin = aristasOrdenadas.removeFirst();
+            TVertice verticeOrigen = arbolCostoMinimo.getVertices().get(aristaMin.getEtiquetaOrigen());
+            TVertice verticeDestino = arbolCostoMinimo.getVertices().get(aristaMin.getEtiquetaDestino());
+            if (!arbolCostoMinimo.conectados(verticeOrigen, verticeDestino)) {
+                arbolCostoMinimo.insertarArista(aristaMin);
+                aristasAgregadas++;
+            }
+        }
+        return arbolCostoMinimo;
+    }
