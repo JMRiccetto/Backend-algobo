@@ -179,11 +179,16 @@ public class TGrafoNoDirigido extends TGrafoDirigido implements IGrafoNoDirigido
     //tener el camino mas optimo y los valores de todos los otros. *a chequear igual*
     public void caminoMasSeguro(){
         //Obtener camino optimo planteado por el floydwarshall ejecutado inicialemnte
+        LinkedList<TArista> aristasCaminoOptimo = new LinkedList<>();
 
         //enviar el paquete a traves del camino optimo (el obtenido anteriormente)
         //Aca es donde se puede dar que el enviarPaquete devuelva false y ahi replantear
         //buscar otro camino
-
+        for(TArista arista : aristasCaminoOptimo){
+            if(!arista.enviarPaquete()){
+                //buscar otro camino
+            }
+        }
         //LLegados a este punto el paquete llegó al nodo destino ya sea a traves de el camino
         //optimo inicial o el encontrado si es que se cayo algun nodo
     }
