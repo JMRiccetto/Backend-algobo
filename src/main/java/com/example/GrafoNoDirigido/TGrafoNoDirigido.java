@@ -17,7 +17,6 @@ public class TGrafoNoDirigido extends TGrafoDirigido implements IGrafoNoDirigido
     public TGrafoNoDirigido(Collection<TVertice> vertices, Collection<TArista> aristas) {
         super(vertices, aristas);
         lasAristas.insertarAmbosSentidos(aristas);
-
     }
 
     @Override
@@ -34,64 +33,12 @@ public class TGrafoNoDirigido extends TGrafoDirigido implements IGrafoNoDirigido
 
     @Override
     public TGrafoNoDirigido Prim() {
-        if (!esConexo()) {
-            return null;
-        }
-        LinkedList<TArista> tResultado = new LinkedList<>();
-        LinkedList<TVertice> uVertices = new LinkedList<>();
-        LinkedList<TVertice> vertices = new LinkedList<>();
-        vertices.addAll(getVertices().values());
-        uVertices.add(vertices.pollFirst());
-        double costoPrim = 0;
-        while (!vertices.isEmpty()) {
-            TArista tempArista = lasAristas.buscarMin(uVertices, vertices);
-            if (tempArista != null) {
-                tResultado.add(tempArista);
-                TVertice vert = getVertices().get(tempArista.etiquetaDestino);
-                vertices.remove(vert);
-                uVertices.add(vert);
-                costoPrim += tempArista.costo;
-            }
-            
-        }
-        return new TGrafoNoDirigido(uVertices, tResultado);
+      throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public TGrafoNoDirigido Kruskal() {
-        if (!esConexo()) {
-            return null;
-        }
-        TAristas F = new TAristas();
-        int numVertices = getVertices().size();
-        Map<Comparable, Integer> componentes = new HashMap<>();
-        int i = 0;
-        for (Comparable vertice : getVertices().keySet()) {
-            componentes.put(vertice, i);
-            i++;
-        }
-        int contador = numVertices - 1;
-
-        Iterator<TArista> iter = lasAristas.iterator();
-        while (contador > 0 && iter.hasNext()) {
-            TArista arista = iter.next();
-            Integer comp1 = componentes.get(arista.etiquetaOrigen);
-            Integer comp2 = componentes.get(arista.etiquetaDestino);
-            if (!comp1.equals(comp2)) {
-                F.add(arista);
-                for (Comparable vertice : getVertices().keySet()) {
-                    if (componentes.get(vertice).equals(comp1)) {
-                        componentes.put(vertice, comp2);
-                    }
-                }
-                contador--;
-            }
-        }
-        if (contador > 0) {
-            return null;
-        }
-        TGrafoNoDirigido kruskal = new TGrafoNoDirigido(getVertices().values(), F);
-        return kruskal;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -232,6 +179,38 @@ public class TGrafoNoDirigido extends TGrafoDirigido implements IGrafoNoDirigido
         return res2;
     }
 
+    public LinkedList<TArista> getAristasPorCaminoDeVertices(LinkedList<TVertice> vertices){
+        LinkedList<TArista> aristas = new LinkedList<>();
+        for(int i = 0; i < vertices.size(); i++){
+            TVertice v1 = vertices.get(i);
+            TVertice v2 = vertices.get(i+1);
+            for(TArista a : (LinkedList<TArista>) v1.getAristas()){
+                if(a.etiquetaDestino == v2.getEtiqueta()){
+                    aristas.add(a);
+                    break;
+                }
+            }
+        }
+        return aristas;
+    }
+
+    public LinkedList<TVertice> dijkstraa(Comparable etiquetaInicio, Comparable etiquetaDestino){
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public TVertice getVerticePorEtiqueta(Comparable etiqueta){
+        return this.getVertices().get(etiqueta);
+    }
+
+    public boolean buscarNodoAnteriorConMasDeUnaArista(int indexAristaAnterior, LinkedList<TArista> aristasCaminoOptimo){
+        TArista aristaAnterior = aristasCaminoOptimo.get(indexAristaAnterior);
+        Comparable etiquetaAnterior = aristaAnterior.getEtiquetaOrigen();
+        TVertice verticeAnterior = this.getVerticePorEtiqueta(etiquetaAnterior);
+        if(verticeAnterior.getAristas().size() > 1){
+            return true;
+        }
+        return false;
+    }
 
     //TODO: definir que devuelve si lsita de aristas o nodos, o ambas.
     //Este metodo se ejecutara en un metodo main o algo por el estilo
@@ -239,14 +218,32 @@ public class TGrafoNoDirigido extends TGrafoDirigido implements IGrafoNoDirigido
     //tener el camino mas optimo y los valores de todos los otros. *a chequear igual*
     public void caminoMasSeguro(){
         //Obtener camino optimo planteado por el floydwarshall ejecutado inicialemnte
-        LinkedList<TArista> aristasCaminoOptimo = new LinkedList<>();
+        int[][] pred = new int[this.getVertices().size()][this.getVertices().size()];
+        this.floydWarshall(pred);
+        LinkedList<TVertice> verticesCaminoOptimo = this.getPredecesores(pred, "A", "L"); //TODO:Poner los vert como params del caminoMasSeguro
+        LinkedList<TArista> aristasCaminoOptimo = this.getAristasPorCaminoDeVertices(verticesCaminoOptimo);
 
         //enviar el paquete a traves del camino optimo (el obtenido anteriormente)
         //Aca es donde se puede dar que el enviarPaquete devuelva false y ahi replantear
         //buscar otro camino
         for(TArista arista : aristasCaminoOptimo){
             if(!arista.enviarPaquete()){
-                //buscar otro camino
+                arista.caido = true;
+                boolean hacerDijkstra = false;
+                int indexArista = aristasCaminoOptimo.indexOf(arista);
+                int contador = 0;
+                while(!hacerDijkstra){
+                    contador++;
+                    int index = indexArista-contador;
+                    hacerDijkstra = this.buscarNodoAnteriorConMasDeUnaArista(index, aristasCaminoOptimo);//TODO:Chequear caso borde cuando da 0-1
+                }
+                int indexAristaAnterior = aristasCaminoOptimo.indexOf(arista) - contador;//TODO:Chequear caso borde cuando da 0-1
+                TArista aristaAnterior = aristasCaminoOptimo.get(indexAristaAnterior);
+                Comparable etiquetaAnterior = aristaAnterior.getEtiquetaOrigen();
+                TVertice verticeAnterior = this.getVerticePorEtiqueta(etiquetaAnterior);
+                LinkedList<TVertice> caminoOptimoDijkstra = this.dijkstraa(etiquetaAnterior, "L");
+
+
             }
         }
         //LLegados a este punto el paquete llegó al nodo destino ya sea a traves de el camino

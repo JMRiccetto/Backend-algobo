@@ -9,7 +9,7 @@ public class TArista implements IArista {
     protected double costo;
     public int paquetesEnviados = 0;
     public int paquetesConfirmados = 0;
-
+    public boolean caido = false;
 
     public TArista(Comparable etiquetaOrigen, Comparable etiquetaDestino, double costo) {
         this.etiquetaOrigen = etiquetaOrigen;
