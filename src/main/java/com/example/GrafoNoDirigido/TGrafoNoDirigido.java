@@ -148,35 +148,35 @@ public class TGrafoNoDirigido extends TGrafoDirigido implements IGrafoNoDirigido
         return false;
     }
 
-    public double[][] floydWarshall(int[][] predecesores) {
-        int n = this.getVertices().size();
-        double[][] distancias = this.obtenerMatrizAdyacencia();
-
+    public Double[][] floydWarshall(int[][] predecesores) {
+        Double[][] matrixFloyd = UtilGrafos.obtenerMatrizCostos(getVertices());
         if(predecesores == null){
-            predecesores = new int[distancias.length][distancias.length];
+            predecesores = new int[matrixFloyd.length][matrixFloyd.length];
         }
-        
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (i != j && distancias[i][j] == 0) {
-                    distancias[i][j] = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < matrixFloyd.length; i++) {
+            for (int j = 0; j < matrixFloyd.length; j++) {
+                if (i != j && matrixFloyd[i][j] != Double.POSITIVE_INFINITY) {
+                    predecesores[i][j] = i;
+                } else {
+                    predecesores[i][j] = -1;
                 }
             }
         }
-        
-        for (int k = 0; k < n; k++) {
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    if (distancias[i][k] + distancias[k][j] < distancias[i][j]) {
-                        distancias[i][j] = distancias[i][k] + distancias[k][j];
-                        predecesores[i][j] = k;
+        int i,j,k;
+        for (k = 0; k < this.getVertices().size(); k++){
+            for (i = 0; i < this.getVertices().size(); i++){
+                for (j = 0; j < this.getVertices().size(); j++){
+                    if(matrixFloyd[i][k] + matrixFloyd[k][j] < matrixFloyd[i][j]){
+                        matrixFloyd[i][j] = matrixFloyd[i][k] + matrixFloyd[k][j];
+                        predecesores[i][j] =predecesores[k][j];
                     }
                 }
             }
         }
-        
-        return distancias;
+        return matrixFloyd;
     }
+
+
 
     public double[][] obtenerMatrizAdyacencia() {
         int n = this.getVertices().size();
@@ -192,7 +192,6 @@ public class TGrafoNoDirigido extends TGrafoDirigido implements IGrafoNoDirigido
         return matriz;
     }
 
-    //TODO: Chequear si no queda en while infinito por temas de conexo
     public LinkedList<TVertice> getPredecesores(int[][] predecesores, Comparable vert1, Comparable vert2) {
         Object[] etiquetas = this.getVertices().keySet().toArray();
         ArrayList<Object> x = new ArrayList<>(etiquetas.length);
@@ -206,14 +205,15 @@ public class TGrafoNoDirigido extends TGrafoDirigido implements IGrafoNoDirigido
         int newIndex = predecesores[indexOfVert1][indexOfVert2];
         LinkedList<Integer> indexResult = new LinkedList<>();
         indexResult.add(indexOfVert1);
-        indexResult.add(newIndex);
+        //indexResult.add(newIndex);
 
         while(!foundFinalVert){
-            if(newIndex == indexOfVert2){
+            if(newIndex == indexOfVert1){
                 indexResult.add(indexOfVert2);
                 foundFinalVert = true;
             }else{
-                predecesores[newIndex][indexOfVert2] = newIndex;
+                indexOfVert1 = newIndex;
+                newIndex = predecesores[indexOfVert1][indexOfVert2];
                 indexResult.add(newIndex);
             }
         }
@@ -226,7 +226,7 @@ public class TGrafoNoDirigido extends TGrafoDirigido implements IGrafoNoDirigido
         //obtiene el vertice mediante su etiqueta
         LinkedList<TVertice> res2 = new LinkedList<>();
         for(Object o : res){
-            res2.add(this.getVertices().get(o));
+            res2.add(this.getVertices().get(etiquetas[(Integer) o]));
         }
 
         return res2;

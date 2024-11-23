@@ -7,6 +7,7 @@ import java.util.*;
 public class TVertice<T> implements IVertice {
 
     private Comparable etiqueta;
+    private LinkedList<TArista> aristas;
     private LinkedList<TAdyacencia> adyacentes;
     private boolean visitado;
     private T datos;
@@ -26,7 +27,20 @@ public class TVertice<T> implements IVertice {
     public TVertice(Comparable unaEtiqueta) {
         this.etiqueta = unaEtiqueta;
         adyacentes = new LinkedList();
+        aristas = new LinkedList();
         visitado = false;
+    }
+
+    public LinkedList<TArista> getAristas(){
+        return aristas;
+    }
+
+    public void setAristas(LinkedList<TArista> aristas) {
+        this.aristas = aristas;
+    }
+
+    public void setArista(TArista arista) {
+        this.aristas.addLast(arista);
     }
 
     public void setVisitado(boolean valor) {
