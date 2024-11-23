@@ -148,9 +148,13 @@ public class TGrafoNoDirigido extends TGrafoDirigido implements IGrafoNoDirigido
         return false;
     }
 
-    public double[][] floydWarshall() {
+    public double[][] floydWarshall(int[][] predecesores) {
         int n = this.getVertices().size();
-        double[][] distancias = this.obtenerMatrizAdyacencia(); 
+        double[][] distancias = this.obtenerMatrizAdyacencia();
+
+        if(predecesores == null){
+            predecesores = new int[distancias.length][distancias.length];
+        }
         
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
@@ -165,6 +169,7 @@ public class TGrafoNoDirigido extends TGrafoDirigido implements IGrafoNoDirigido
                 for (int j = 0; j < n; j++) {
                     if (distancias[i][k] + distancias[k][j] < distancias[i][j]) {
                         distancias[i][j] = distancias[i][k] + distancias[k][j];
+                        predecesores[i][j] = k;
                     }
                 }
             }
@@ -186,6 +191,47 @@ public class TGrafoNoDirigido extends TGrafoDirigido implements IGrafoNoDirigido
         }
         return matriz;
     }
+
+    //TODO: Chequear si no queda en while infinito por temas de conexo
+    public LinkedList<TVertice> getPredecesores(int[][] predecesores, Comparable vert1, Comparable vert2) {
+        Object[] etiquetas = this.getVertices().keySet().toArray();
+        ArrayList<Object> x = new ArrayList<>(etiquetas.length);
+        for (int i = 0; i < etiquetas.length; i++) {
+            x.add(etiquetas[i]);
+        }
+        int indexOfVert1 = x.indexOf(vert1);
+        int indexOfVert2 = x.indexOf(vert2);
+        boolean foundFinalVert = false;
+
+        int newIndex = predecesores[indexOfVert1][indexOfVert2];
+        LinkedList<Integer> indexResult = new LinkedList<>();
+        indexResult.add(indexOfVert1);
+        indexResult.add(newIndex);
+
+        while(!foundFinalVert){
+            if(newIndex == indexOfVert2){
+                indexResult.add(indexOfVert2);
+                foundFinalVert = true;
+            }else{
+                predecesores[newIndex][indexOfVert2] = newIndex;
+                indexResult.add(newIndex);
+            }
+        }
+
+        LinkedList<Object> res = new LinkedList<>();
+        for(Integer i : indexResult){
+            res.add(i);
+        }
+
+        //obtiene el vertice mediante su etiqueta
+        LinkedList<TVertice> res2 = new LinkedList<>();
+        for(Object o : res){
+            res2.add(this.getVertices().get(o));
+        }
+
+        return res2;
+    }
+
 
     //TODO: definir que devuelve si lsita de aristas o nodos, o ambas.
     //Este metodo se ejecutara en un metodo main o algo por el estilo
