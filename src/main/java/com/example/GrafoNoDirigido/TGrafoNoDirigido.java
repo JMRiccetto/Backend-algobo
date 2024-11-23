@@ -173,6 +173,20 @@ public class TGrafoNoDirigido extends TGrafoDirigido implements IGrafoNoDirigido
         return distancias;
     }
 
+    public double[][] obtenerMatrizAdyacencia() {
+        int n = this.getVertices().size();
+        double[][] matriz = new double[n][n];
+        List<Comparable> etiquetas = new ArrayList<>(this.getVertices().keySet());
+
+        for (TArista arista : this.getLasAristas()) {
+            int i = etiquetas.indexOf(arista.getEtiquetaOrigen());
+            int j = etiquetas.indexOf(arista.getEtiquetaDestino());
+            matriz[i][j] = arista.getCosto();
+            matriz[j][i] = arista.getCosto(); 
+        }
+        return matriz;
+    }
+
     //TODO: definir que devuelve si lsita de aristas o nodos, o ambas.
     //Este metodo se ejecutara en un metodo main o algo por el estilo
     //entonces antes de ejecutarlo correr un floydwarshall para ya
