@@ -123,7 +123,104 @@ public class TGrafoNoDirigido extends TGrafoDirigido implements IGrafoNoDirigido
         return matrixFloyd;
     }
 
+//    public HashMap<Comparable, Double> dijkstra(Comparable origen, Comparable destino) {
+//        HashMap<Comparable,Double> fi = new HashMap<>();
+//        fi.put(origen, 0.0);
+//
+//        LinkedList<TVertice> visitados = new LinkedList<>();
+//        LinkedList<TVertice> X = new LinkedList<>();
+//        TVertice nodoOrigen = getVerticePorEtiqueta(origen);
+//        X.add(nodoOrigen);
+//        visitados.add(nodoOrigen);
+//
+//        while(true){
+//
+//            Double min = Double.POSITIVE_INFINITY;
+//            Double costoActual = min;
+//            TArista aristaMenorCosto = null;
+//
+//            LinkedList<TArista> aristasVert = new LinkedList<>();
+//
+//            for(TVertice vert : X){
+//                LinkedList<TArista> vertAristas = vert.getAristas();
+//                for (TArista a : vertAristas) {
+//                    if(!visitados.contains(
+//                            this.getVerticePorEtiqueta(aristaMenorCosto.etiquetaDestino)
+//                    )) {
+//                        aristasVert.add(a);
+//                    }
+//                }
+//
+//            }
+//
+//            for (TArista arista : aristasVert) {
+//                var verticeOrigenArista = this.getVerticePorEtiqueta(aristaMenorCosto.etiquetaOrigen);
+//                costoActual = fi.get(verticeOrigenArista) + arista.getCosto();
+//                if (costoActual <= min) {
+//                    min = costoActual;
+//                    aristaMenorCosto = arista;
+//                }
+//            }
+//            TVertice vertx = this.getVerticePorEtiqueta(aristaMenorCosto.etiquetaDestino);
+//            X.add(vertx);
+//            visitados.push(vertx);
+//            fi.put(vertx.getEtiqueta(), min);
+//
+//            if(destino == aristaMenorCosto.etiquetaDestino){
+//                return fi;
+//            }
+//        }
+//    }
 
+public HashMap<Comparable, Double> dijkstra(Comparable origen, Comparable destino) {
+    HashMap<Comparable,Double> fi = new HashMap<>();
+    fi.put(origen, 0.0);
+
+    LinkedList<TVertice> visitados = new LinkedList<>();
+    LinkedList<TVertice> X = new LinkedList<>();
+    TVertice nodoOrigen = getVerticePorEtiqueta(origen);
+    X.add(nodoOrigen);
+    visitados.add(nodoOrigen);
+    HashMap<Comparable, Comparable> predecesores = new HashMap<>();
+    predecesores.put(origen, null);
+    while(true){
+
+        Double min = Double.POSITIVE_INFINITY;
+        Double costoActual = min;
+        TArista aristaMenorCosto = null;
+
+        LinkedList<TArista> aristasVert = new LinkedList<>();
+
+        for(TVertice vert : X){
+            LinkedList<TArista> vertAristas = vert.getAristas();
+            for (TArista a : vertAristas) {
+                if(!visitados.contains(this.getVerticePorEtiqueta(a.aristaInversa().etiquetaDestino))) {
+                    aristasVert.add(a.aristaInversa());
+                }
+            }
+
+        }
+
+        for (TArista arista : aristasVert) {
+            TVertice verticeOrigenArista = this.getVerticePorEtiqueta(arista.etiquetaOrigen);
+            costoActual = fi.get(verticeOrigenArista.getEtiqueta()) + arista.getCosto();
+            if (costoActual <= min) {
+                min = costoActual;
+                aristaMenorCosto = arista;
+            }
+        }
+        TVertice vertx = this.getVerticePorEtiqueta(aristaMenorCosto.etiquetaDestino);
+        X.add(vertx);
+        visitados.push(vertx);
+        fi.put(vertx.getEtiqueta(), min);
+        predecesores.put(vertx.getEtiqueta(), aristaMenorCosto.etiquetaOrigen);
+
+        if(destino == aristaMenorCosto.etiquetaDestino){
+            System.out.println(predecesores);
+            return fi;
+        }
+    }
+}
 
     public double[][] obtenerMatrizAdyacencia() {
         int n = this.getVertices().size();
@@ -194,9 +291,6 @@ public class TGrafoNoDirigido extends TGrafoDirigido implements IGrafoNoDirigido
         return aristas;
     }
 
-    public LinkedList<TVertice> dijkstraa(Comparable etiquetaInicio, Comparable etiquetaDestino){
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
     public TVertice getVerticePorEtiqueta(Comparable etiqueta){
         return this.getVertices().get(etiqueta);
@@ -241,7 +335,7 @@ public class TGrafoNoDirigido extends TGrafoDirigido implements IGrafoNoDirigido
                 TArista aristaAnterior = aristasCaminoOptimo.get(indexAristaAnterior);
                 Comparable etiquetaAnterior = aristaAnterior.getEtiquetaOrigen();
                 TVertice verticeAnterior = this.getVerticePorEtiqueta(etiquetaAnterior);
-                LinkedList<TVertice> caminoOptimoDijkstra = this.dijkstraa(etiquetaAnterior, "L");
+                LinkedList<TVertice> caminoOptimoDijkstra = this.dijkstra(etiquetaAnterior, "L");
 
 
             }
